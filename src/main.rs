@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 use flate2::read::ZlibDecoder;
 use std::ffi::CStr;
 use std::fs;
+use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
 
@@ -80,26 +81,50 @@ fn main() -> anyhow::Result<()> {
                 _ => anyhow::bail!("we don't know how to deal with kind: '{kind}'"),
             };
             let size = size
-                .parse::<usize>()
+                .parse::<u64>()
                 .context(".git/objects file header has invalid size: {size}")?;
-            buf.clear();
-            buf.resize(size, 0);
-            z.read_exact(&mut buf[..])
-                .context("read true contents of .git/objects file")?;
-            let n = z
-                .read(&mut [0])
-                .context("validate EOF in .git/objects file")?;
-            anyhow::ensure!(n == 0, ".git/objects file had {n} trailing bytes");
-            let mut stdout = std::io::stdout().lock();
+            let mut z = LimitReader {
+                reader: z,
+                limit: size as usize,
+            };
             match kind {
                 Kind::Blob => {
-                    stdout
-                        .write_all(&buf)
-                        .context("wrtie object contents to stdout")?;
+                    let mut stdout = std::io::stdout().lock();
+                    let n = std::io::copy(&mut z, &mut stdout)
+                        .context("write .git/objects files to stdout")?;
+                    anyhow::ensure!(
+                        n == size,
+                        ".git/objects file was not the expected size (expected: {size}, actual: {n})"
+                    );
                 }
             }
         }
     }
 
     Ok(())
+}
+
+/// Wrapper type around a reader that sets an explicit limit on the number of bytes to read.
+struct LimitReader<R> {
+    /// Underlying reader (e.g., `BufReader<ZlibDecoder<File>>`).
+    reader: R,
+    /// The maximum number of bytes that can be read.
+    limit: usize,
+}
+
+impl<R> Read for LimitReader<R>
+where
+    R: Read,
+{
+    fn read(&mut self, mut buf: &mut [u8]) -> std::io::Result<usize> {
+        if buf.len() > self.limit {
+            buf = &mut buf[..self.limit + 1];
+        }
+        let n = self.reader.read(buf)?;
+        if n > self.limit {
+            return Err(io::Error::other("too many bytes"));
+        }
+        self.limit -= n;
+        Ok(n)
+    }
 }
