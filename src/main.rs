@@ -4,6 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 pub(crate) mod commands;
+pub(crate) mod objects;
 
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
@@ -12,7 +13,7 @@ struct Args {
     command: Command,
 }
 
-/// Subcommands
+/// Git subcommands.
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Initialize a new Git repository
@@ -35,6 +36,14 @@ enum Command {
         file: PathBuf,
         // TODO: support reading in from standard input with `--stdin`
     },
+    /// Inspect a tree object.
+    LsTree {
+        /// Lists file contents by name only, excluding mode, object type, and object hashes.
+        #[clap(long)]
+        name_only: bool,
+        /// The hash of the tree object to list.
+        tree_sha: String,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -53,6 +62,10 @@ fn main() -> anyhow::Result<()> {
             object_hash,
         } => commands::cat_file::invoke(pretty_print, object_hash)?,
         Command::HashObject { write, file } => commands::hash_object::invoke(write, &file)?,
+        Command::LsTree {
+            name_only,
+            tree_sha,
+        } => commands::ls_tree::invoke(name_only, &tree_sha)?,
     }
 
     Ok(())

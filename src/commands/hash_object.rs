@@ -43,7 +43,7 @@ pub(crate) fn invoke(write: bool, file: &Path) -> anyhow::Result<()> {
     let hash = if write {
         let tmp = "tmp";
         let hash = write_blob(
-            &file,
+            file,
             std::fs::File::create(tmp).context("construct temporary file for blob")?,
         )
         .context("write out blob object")?;

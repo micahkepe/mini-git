@@ -1,9 +1,15 @@
 [package]
-name = "codecrafters-git"
+name = "mini-git"
 version = "0.1.0"
-authors = ["Codecrafters <hello@codecrafters.io>"]
+authors = ["Micah Kepe <micahkepe@gmail.com>"]
 edition = "2021"
 rust-version = "1.80"
+homepage = "https://github.com/micahkepe/mini-git"
+repository = "https://github.com/micahkepe/mini-git"
+readme = "README.md"
+description = """
+A subset of Git written in Rust.
+"""
 
 [dependencies]
 anyhow = "1.0.68"                                # error handling
