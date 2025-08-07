@@ -8,6 +8,6 @@ Git"](https://app.codecrafters.io/courses/git/overview).
 - [x] `cat-file` subcommand
 - [x] `hash-object` subcommand
 - [x] `ls-tree` subcommand
-- [ ] `write-tree` subcommand
+- [x] `write-tree` subcommand
 - [ ] `commit-tree` subcommand
 - [ ] `clone` subcommand

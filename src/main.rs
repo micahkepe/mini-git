@@ -44,6 +44,8 @@ enum Command {
         /// The hash of the tree object to list.
         tree_sha: String,
     },
+    /// Create a tree object from the current state of the staging area.
+    WriteTree {},
 }
 
 fn main() -> anyhow::Result<()> {
@@ -66,6 +68,7 @@ fn main() -> anyhow::Result<()> {
             name_only,
             tree_sha,
         } => commands::ls_tree::invoke(name_only, &tree_sha)?,
+        Command::WriteTree {} => commands::write_tree::invoke()?,
     }
 
     Ok(())
