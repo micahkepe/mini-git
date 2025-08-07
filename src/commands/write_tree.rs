@@ -13,7 +13,7 @@ use crate::objects::{Kind, Object};
 /// created, or `None` if the directory is empty.
 ///
 /// NOTE: this uses Unix permissions to determine file mode, so it may not work on Windows.
-fn write_tree_for(path: &Path) -> anyhow::Result<Option<[u8; 20]>> {
+pub(crate) fn write_tree_for(path: &Path) -> anyhow::Result<Option<[u8; 20]>> {
     let dir = fs::read_dir(path).with_context(|| format!("open directory {}", path.display()))?;
     let mut tree_object = Vec::new();
 

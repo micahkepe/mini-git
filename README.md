@@ -9,5 +9,6 @@ Git"](https://app.codecrafters.io/courses/git/overview).
 - [x] `hash-object` subcommand
 - [x] `ls-tree` subcommand
 - [x] `write-tree` subcommand
-- [ ] `commit-tree` subcommand
+- [x] `commit-tree` subcommand
+- [x] `commit` subcommand
 - [ ] `clone` subcommand
