@@ -46,6 +46,19 @@ enum Command {
     },
     /// Create a tree object from the current state of the staging area.
     WriteTree {},
+    /// Create a commit object.
+    CommitTree {
+        /// Commit message.
+        #[clap(short = 'm')]
+        message: String,
+
+        /// Parent tree
+        #[clap(short = 'p')]
+        parent_hash: Option<String>,
+
+        /// Hash of tree object to commit.
+        tree_hash: String,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -69,6 +82,11 @@ fn main() -> anyhow::Result<()> {
             tree_sha,
         } => commands::ls_tree::invoke(name_only, &tree_sha)?,
         Command::WriteTree {} => commands::write_tree::invoke()?,
+        Command::CommitTree {
+            message,
+            tree_hash,
+            parent_hash,
+        } => commands::commit_tree::invoke(message, tree_hash, parent_hash)?,
     }
 
     Ok(())
